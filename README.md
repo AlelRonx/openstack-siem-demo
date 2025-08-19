@@ -1,4 +1,4 @@
-# SIEM Dashboard Integration with OpenStack (MicroStack) & ELK Stack
+# Integration of a SIEM ELK in an OpenStack (MicroStack) environment
 
 This project demonstrates how to integrate an OpenStack infrastructure (MicroStack) with a SIEM stack based on Elasticsearch, Logstash, and Kibana (ELK).
 The goal is to collect events and logs from the OpenStack cloud, route them through Logstash, and process them in Elasticsearch, with visualization in Kibana.
