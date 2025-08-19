@@ -111,6 +111,7 @@ VM ELK => 8Gb RAM // 2 Processors // 30Gb Disk (through custom flavor creation)
 - [Elastic Stack Docker Guide](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)
 - [OpenStack CLI Reference](https://docs.openstack.org/python-openstackclient/latest/)
 
-
-Questo README è sia guida all’uso che report sintetico del progetto nel periodo di Agosto 2025.
-Nomi ed IP sono stati anonimizzati per la realizzazione del repository!
+**Disclaimers**
+* This README is both a user guide and a summary report of the project for the period of August 2025.
+* Names and IPs have been anonymized for the creation of the repository!
+* The laboratory was created without the use of certificates to avoid conflicts and problems during development. The use of certificates is recommended in the event of operational use.
