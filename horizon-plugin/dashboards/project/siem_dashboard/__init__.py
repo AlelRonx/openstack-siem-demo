@@ -1,1 +1,1 @@
-# vuoto, serve solo per dire a Python che è un package
+# Empty, it only serves to tell Python that it is a package
