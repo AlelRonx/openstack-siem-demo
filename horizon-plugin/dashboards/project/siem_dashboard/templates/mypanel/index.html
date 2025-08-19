@@ -1,0 +1,9 @@
+{% extends "horizon/common/_base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>SIEM Dashboard</h2>
+    <iframe src="http://<IP_VM_ELK>:5601/app/dashboards#/view/<ID_KIBANA_DASHBOARD>"
+            width="100%" height="800px" frameborder="0"></iframe>
+</div>
+{% endblock %}
