@@ -1,17 +1,17 @@
-!/usr/bin/env python3
+#!/usr/bin/env python3
 import time
 import json
 import requests
 import os
 
 # ---------------- CONFIGURATION ----------------
-LOGSTASH_URL = "http://<IP_ELK>:5000"  # change with the IP of the ELK VM
+LOGSTASH_URL = "http://<IP_ELK>:5000"  # Change with the IP of the ELK VM
 LOG_FILES = {
     "keystone": "/var/snap/microstack/common/log/keystone.log",
     "nova": "/var/snap/microstack/common/log/nova.log",
     "neutron": "/var/snap/microstack/common/log/neutron.log"
 }
-POLL_INTERVAL = 1  # seconds between checks
+POLL_INTERVAL = 1  # Seconds between checks
 
 # Saves the last position read for each file so collector
 # does not always reread the entire log, but only the new lines.
@@ -51,8 +51,8 @@ def tail_log(service, filepath):
 # ---------------- MAIN CICLE ----------------
 # The infinite while cicle:
 # 1. scrolls services and their logs LOG_FILES (Keystone, Neutron, Nova)
-# 2. if the file exists reads and send a new line
-# 3. it waits POOL_INTERVALS (1 second setted before) and starts again
+# 2. if the file exists reads and send a new log line
+# 3. it waits POOL_INTERVAL (previously set to 1 second) and starts again
 if __name__ == "__main__":
     print("[*] Avvio collector OpenStack")
     try:
@@ -63,4 +63,5 @@ if __name__ == "__main__":
             time.sleep(POLL_INTERVAL)
     except KeyboardInterrupt:
         print("\n[*] Collector terminato")
+
 
