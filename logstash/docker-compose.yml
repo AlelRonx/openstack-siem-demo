@@ -5,7 +5,7 @@ services:
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms4g -Xmx4g
-      # Aggiunta riga per evitare controllo https
+      # Line added to avoid https check
       - xpack.security.enabled=false
     ulimits:
       memlock:
@@ -18,12 +18,14 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.9.0
+    # Connection to the kibana.yml file of the Kibana docker to enter 
+    # a 32-digit key for using the "rules dashboard" in Kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
     environment:
-      # Scegliere in base a controllo https
+      # Choose based on previously https control
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       #- ELASTICSEARCH_HOSTS=https://elasticsearch:9200
     ports:
