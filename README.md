@@ -1,27 +1,25 @@
 SIEM Dashboard Integration with OpenStack (MicroStack) & ELK Stack
 
-Questo progetto dimostra come integrare un’infrastruttura OpenStack (MicroStack) con uno stack SIEM basato su Elasticsearch, Logstash e Kibana (ELK).
-L’obiettivo è raccogliere eventi e log dal cloud OpenStack, instradarli tramite Logstash ed elaborarli in Elasticsearch, con visualizzazione in Kibana.
+This project demonstrates how to integrate an OpenStack infrastructure (MicroStack) with a SIEM stack based on Elasticsearch, Logstash, and Kibana (ELK).
+The goal is to collect events and logs from the OpenStack cloud, route them through Logstash, and process them in Elasticsearch, with visualization in Kibana.
 
-Architettura degli strumenti usati:
-OpenStack (MicroStack): ambiente cloud locale per il laboratorio.
-Collector (collector.py): script Python che raccoglie eventi/log da OpenStack e li invia a Logstash.
-Logstash: riceve i dati dal collector, li filtra e li inoltra ad Elasticsearch.
-Elasticsearch: indicizza i log.
-Kibana: dashboard interattiva per analizzare gli eventi.
+Architecture of the tools used:
+OpenStack (MicroStack): local cloud environment for the laboratory.
+Collector (collector.py): Python script that collects events/logs from OpenStack and sends them to Logstash.
+Logstash: receives data from the collector, filters it, and forwards it to Elasticsearch.
+Elasticsearch: indexes the logs.
+Kibana: interactive dashboard for analyzing events.
 
-Setup del progetto:
-1.Installazione di MicroStack
-
+Project setup:
+1. Installation of MicroStack
 $sudo snap install microstack --devmode --beta
 $sudo microstack init --auto --control
 
-Generazione della password di accesso alla piattaforma ed inserimento della sorgente .rc per le modifiche delle configurazioni di Openstack
+Generation of the platform access password and insertion of the "*.rc" source for changes to Openstack configurations
 $sudo snap get microstack config.credentials.keystone-password
 $sudo source /var/snap/microstack/common/etc/microstack.rc
 
-2.Creazione della rete di laboratorio ed un router dedicato su Openstack
-
+2. Creation of the laboratory network and a dedicated router on Openstack
 $sudo openstack network create lab-net
 $sudo openstack subnet create lab-subnet \
   --network lab-net \
@@ -32,29 +30,25 @@ $sudo openstack router create lab-router
 $sudo openstack router set lab-router --external-gateway external
 $sudo openstack router add subnet lab-router lab-subnet
 
-3.Creazione della VM ELK
-
-Scaricare l’immagine ufficiale Ubuntu desiderata dall'elenco (link a pie' di pagina):
-
+3. Creating the ELK VM
+Download the desired official Ubuntu image from the list (link at the bottom of the page):
 $sudo wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 
-Si consiglia di intervenire sul file .img modificando le credenziali dell'immmagine
+I recommend modifying the "*.img" file by changing the image credentials.
 $sudo apt install guestfs-tools -y
 $sudo virt-customize -a noble-server-cloudimg-amd64.img --password ubuntu:password:ubuntu
 $sudo virt-customize -a noble-server-cloudimg-amd64.img -root-password password:password
 
-Caricare l’immagine su MicroStack:
-
+Upload the image to OpenStack:
 $sudo openstack image create "ubuntu-24.04-noble" \
   --file noble-server-cloudimg-amd64.img \
   --disk-format qcow2 \
   --container-format bare \
   --public
 
-Si consiglia di modificare le regole nel Security Group per ELK aggiungendo regole sulle porte per elasticsearch(9200), kibana (5601), logstash (5000)
+I recommend modifying the rules in the "Security Group" for ELK by adding access rules on ports for elasticsearch (9200), kibana (5601), and logstash (5000).
 
-Creare la VM ELK su Compute:
-
+Create the ELK VM on OpenStack Compute:
 $sudo openstack server create \
   --image ubuntu-24.04-noble \
   --flavor m1.high \
@@ -62,51 +56,44 @@ $sudo openstack server create \
   --security-group default \
   elk
 
-Avviata l'istanza si consiglia di procedere in SSH sulla macchina in alternativa accedere alla console forita da Openstack
+Once the instance has been started, I recommend proceeding via SSH on the machine or, alternatively, accessing the console provided by Openstack.
 $sudo ssh -i /home/root/snap/microstack/common/.ssh/id_microstack root@10.20.20.47
 
-Eventuali problematiche di negazione permesso di accesso possono essere risolte copiando la chiave pubblica di id_microstack in ~/.ssh/authorized_keys della VM "elk"
+Any issues with access "permission denial" can be resolved by copying the public key of id_microstack to ~/.ssh/authorized_keys of the ELK VM.
 
-4.Setup dello stack ELK nella VM
-
-Nella VM ELK installare Docker e avviare i servizi:
-
+4. Setting up the ELK stack in the VM
+In the ELK VM, install Docker and start the services:
 $sudo docker load -i elasticsearch-8.9.0.tar
 $sudo docker load -i kibana-8.9.0.tar
 $sudo docker load -i logstash-8.9.0.tar
 
 $sudo docker-compose up -d
 
-5.Configurazione file docker-compose.yml e json-opestack.conf
-
-Il file docker-compose.yml configura i docker con i servizi utili al progetto mentre il file json-opestack.conf serve a Logstsh per rimanere in ascolto:
-
+5. Configuration of docker-compose.yml and json-opestack.conf files
+The docker-compose.yml file configures the dockers with the services useful for the project, while the json-opestack.conf file is used by Logstsh to remain listening:
 $sudo mkdir -p /opt/elk/logstash/pipeline/
 $sudo cp docker-compose.yml /opt/elk/docker-compose.yml
 $sudo cp json-opestack.conf /opt/elk/logstash/pipeline/json-opestack.conf
 
 6.Collector (collector.py)
-
-Lo script collector.py è il fulcro del progetto in quanto si connette a Keystone/OpenStack e raccoglie eventi di interesse (es. autenticazioni, creazione risorse), li converte in JSON e li invia a Logstash sulla porta 5000.
-Deve essere avviato sulla macchina di Openstack
-
+The collector.py script is the core of the project as it connects to SIEM and collects events of interest (e.g., authentications, resource creation), converts them to JSON, and sends them to Logstash on port 5000.
+collector.py must be started on the Openstack machine where OpenStack is installed.
 $sudo python3 collector.py
 
-7.Risultato e limitazioni
+7. Results and limitations
+Once collector.py is launched, the Keystone, Neutron, and Nova logs are collected, sent to Logstash, indexed in Elasticsearch, and displayed in Kibana in a custom dashboard thanks to the rules implemented in Kibana.
 
-Una volta avviato collector.py i log di keystone, Neutron e Nova vengono raccolti, inviati a Logstash, indicizzati in Elasticsearch e visualizzati in Kibana in una dashboard personalizzata.
+I recommend creating virtual machines with the minimum of the following hardware:
+VM Openstack => 16Gb Memory // 2/2 Processors // 100Gb SCSI
+VM ELK => 8Gb RAM // 2 Processors // 30Gb Disk (through custom flavor creation)
 
-Si consiglia di creare le macchine virutali con il minimo del seguente hardware:
-VM Openstack => 16Gb Memory // 2/2 Processors // 100GB SCSI
-VM Elk => 8Gb RAM // 2 Processors // 30GB Disk (attraverso creazione flavor personalizzato)
-
-Inizialmente il progetto prevedeva la creazione di una Dashboard su Horizon sotto Project e collegata con la dashboard personalizzata di Kibana ma data la dipendenza a snap (read-only delle directory) di Microstack questo non e' stato possibile.
-Eventuali file della creazione della dashboard sono stati comunque implementati ma non eseguiti.
-E' possibile seguire la guida ufficiale per l'eventuale implementazione con differenti creazioni di Openstack
+Initially, the project involved creating a Dashboard on Horizon under Project and linking it to Kibana's custom dashboard, but given Microstack's dependence on snap (read-only directories), this was not possible.
+Any files related to the creation of the dashboard were implemented but not executed.
+You can follow the official guide for possible implementation with different Openstack creations.
 
 https://docs.openstack.org/horizon/latest/contributor/tutorials/dashboard.html
 
-Documentazione di riferimento utilizzata per l'implementazione e la configurazione:
+Reference documentation used for implementation and configuration:
 MicroStack Documentation
 https://microstack.run/docs/
 MicroStack CLI Reference
