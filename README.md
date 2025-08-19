@@ -10,8 +10,8 @@ Logstash: receives data from the collector, filters it, and forwards it to Elast
 Elasticsearch: indexes the logs.
 Kibana: interactive dashboard for analyzing events.
 
-# Project setup:
-**1. Installation of MicroStack**
+## Project setup:
+### 1. Installation of MicroStack
 ``` bash
 $sudo snap install microstack --devmode --beta
 $sudo microstack init --auto --control
@@ -21,7 +21,7 @@ $sudo microstack init --auto --control
 $sudo snap get microstack config.credentials.keystone-password
 $sudo source /var/snap/microstack/common/etc/microstack.rc
 ```
-**2. Creation of the laboratory network and a dedicated router on Openstack**
+### 2. Creation of the laboratory network and a dedicated router on Openstack
 ``` bash
 $sudo openstack network create lab-net
 $sudo openstack subnet create lab-subnet \
@@ -33,12 +33,12 @@ $sudo openstack router create lab-router
 $sudo openstack router set lab-router --external-gateway external
 $sudo openstack router add subnet lab-router lab-subnet
 ```
-**3. Creating the ELK VM**
+### 3. Creating the ELK VM
 * Download the desired official Ubuntu image from the list (link at the bottom of the page):
 ``` bash
 $sudo wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 ```
-* I recommend modifying the "*.img" file by changing the image credentials.
+I recommend modifying the "*.img" file by changing the image credentials.
 ``` bash
 $sudo apt install guestfs-tools -y
 $sudo virt-customize -a noble-server-cloudimg-amd64.img --password ubuntu:password:ubuntu
@@ -52,7 +52,7 @@ $sudo openstack image create "ubuntu-24.04-noble" \
   --container-format bare \
   --public
 ```
-* I recommend modifying the rules in the "Security Group" for ELK by adding access rules on ports for elasticsearch (9200), kibana (5601), and logstash (5000).
+I recommend modifying the rules in the "Security Group" for ELK by adding access rules on ports for elasticsearch (9200), kibana (5601), and logstash (5000).
 
 * Create the ELK VM on OpenStack Compute:
 ``` bash
@@ -65,13 +65,13 @@ $sudo openstack server create \
 ```
 * Create and associate the Floating IP with the ELM VM from the OpenStack Floating IPs dashboard.
 
-* Once the instance has been started, I recommend proceeding via SSH on the machine or, alternatively, accessing the console provided by Openstack.
+Once the instance has been started, I recommend proceeding via SSH on the machine or, alternatively, accessing the console provided by Openstack.
 ``` bash
 $sudo ssh -i /home/root/snap/microstack/common/.ssh/id_microstack root@10.20.20.10
 ```
-* Any issues with access "permission denial" can be resolved by copying the public key of id_microstack to ~/.ssh/authorized_keys of the ELK VM.
+Any issues with access "permission denial" can be resolved by copying the public key of id_microstack to ~/.ssh/authorized_keys of the ELK VM.
 
-**4. Setting up the ELK stack in the VM**
+### 4. Setting up the ELK stack in the VM
 * In the ELK VM, install Docker and start the services:
 ``` bash
 $sudo docker load -i elasticsearch-8.9.0.tar
@@ -80,38 +80,38 @@ $sudo docker load -i logstash-8.9.0.tar
 
 $sudo docker-compose up -d
 ```
-**5. Configuration of docker-compose.yml and json-opestack.conf files**
+### 5. Configuration of docker-compose.yml and json-opestack.conf files
 * The docker-compose.yml file configures the dockers with the services useful for the project, while the json-opestack.conf file is used by Logstsh to remain listening:
 ``` bash
 $sudo mkdir -p /opt/elk/logstash/pipeline/
 $sudo cp docker-compose.yml /opt/elk/docker-compose.yml
 $sudo cp json-opestack.conf /opt/elk/logstash/pipeline/json-opestack.conf
 ```
-**6.Collector (collector.py)**
+### 6.Collector (collector.py)
 * The collector.py script is the core of the project as it connects to SIEM and collects events of interest (e.g., authentications, resource creation), converts them to JSON, and sends them to Logstash on port 5000.
 collector.py must be started on the Openstack machine where OpenStack is installed.
 ``` bash
 $sudo python3 collector.py
 ```
-**7. Results and limitations**
+### 7. Results and limitations
 * Once collector.py is launched, the Keystone, Neutron, and Nova logs are collected, sent to Logstash, indexed in Elasticsearch, and displayed in Kibana in a custom dashboard thanks to the rules implemented in Kibana.
 
-* I recommend creating virtual machines with the minimum of the following hardware:
+I recommend creating virtual machines with the minimum of the following hardware:
 ``` bash
 VM Openstack => 16Gb Memory // 2/2 Processors // 100Gb SCSI
 VM ELK => 8Gb RAM // 2 Processors // 30Gb Disk (through custom flavor creation)
 ```
-* Initially, the project involved creating a Dashboard on Horizon under Project and linking it to Kibana's custom dashboard, but given Microstack's dependence on snap (read-only directories), this was not possible.
-* Any files related to the creation of the dashboard were implemented but not executed.
-* You can follow the [Official Guide](https://docs.openstack.org/horizon/latest/contributor/tutorials/dashboard.html) for possible implementation with different Openstack creations.
+Initially, the project involved creating a Dashboard on Horizon under Project and linking it to Kibana's custom dashboard, but given Microstack's dependence on snap (read-only directories), this was not possible.
+Any files related to the creation of the dashboard were implemented but not executed.
+You can follow the [Official Guide](https://docs.openstack.org/horizon/latest/contributor/tutorials/dashboard.html) for possible implementation with different Openstack creations.
 
-**Reference documentation used for implementation and configuration:**
+### Reference documentation used for implementation and configuration:
 - [MicroStack Documentation](https://microstack.run/docs/)
 - [MicroStack Start Reference](https://discourse.ubuntu.com/t/get-started-with-microstack/13998)
 - [Elastic Stack Docker Guide](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)
 - [OpenStack CLI Reference](https://docs.openstack.org/python-openstackclient/latest/)
 
-**Disclaimers**
+### Disclaimers
 * This README is both a user guide and a summary report of the project for the period of August 2025.
 * Names and IPs have been anonymized for the creation of the repository!
 * The laboratory was created without the use of certificates to avoid conflicts and problems during development. The use of certificates is recommended in the event of operational use.
