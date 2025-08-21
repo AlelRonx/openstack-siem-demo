@@ -34,7 +34,7 @@ $sudo openstack router set lab-router --external-gateway external
 $sudo openstack router add subnet lab-router lab-subnet
 ```
 ### 3. Creating the ELK VM
-* Download the desired official Ubuntu image from the list (link at the bottom of the page):
+* Download the desired Official Ubuntu images from the list (link at the bottom of the page):
 ``` bash
 $sudo wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 ```
@@ -108,6 +108,7 @@ You can follow the [Official Guide](https://docs.openstack.org/horizon/latest/co
 ### Reference documentation used for implementation and configuration:
 - [MicroStack Documentation](https://microstack.run/docs/)
 - [MicroStack Start Reference](https://discourse.ubuntu.com/t/get-started-with-microstack/13998)
+- [Officil Ubuntu Cloud images](https://cloud-images.ubuntu.com/)
 - [Elastic Stack Docker Guide](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)
 - [OpenStack CLI Reference](https://docs.openstack.org/python-openstackclient/latest/)
 
