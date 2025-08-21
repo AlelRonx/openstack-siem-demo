@@ -108,7 +108,7 @@ You can follow the [Official Guide](https://docs.openstack.org/horizon/latest/co
 ### Reference documentation used for implementation and configuration:
 - [MicroStack Documentation](https://microstack.run/docs/)
 - [MicroStack Start Reference](https://discourse.ubuntu.com/t/get-started-with-microstack/13998)
-- [Officil Ubuntu Cloud images](https://cloud-images.ubuntu.com/)
+- [Official Ubuntu Cloud images](https://cloud-images.ubuntu.com/)
 - [Elastic Stack Docker Guide](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)
 - [OpenStack CLI Reference](https://docs.openstack.org/python-openstackclient/latest/)
 
