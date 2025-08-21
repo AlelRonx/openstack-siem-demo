@@ -103,7 +103,7 @@ VM ELK => 8Gb RAM // 2 Processors // 30Gb Disk (through custom flavor creation)
 ```
 Initially, the project involved creating a Dashboard on Horizon under Project and linking it to Kibana's custom dashboard, but given Microstack's dependence on snap (read-only directories), this was not possible.
 Any files related to the creation of the dashboard were implemented but not executed.
-You can follow the [Official Guide](https://docs.openstack.org/horizon/latest/contributor/tutorials/dashboard.html) for possible implementation with different Openstack creations.
+You can follow the [Official Horizon Dashboard Guide](https://docs.openstack.org/horizon/latest/contributor/tutorials/dashboard.html) for possible implementation with different Openstack creations.
 
 ### Reference documentation used for implementation and configuration:
 - [MicroStack Documentation](https://microstack.run/docs/)
